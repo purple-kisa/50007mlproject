@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+symbols = ['START', 'STOP', 'O', 'B-positive', 'I-positive', 'B-neutral', 'I-neutral', 'B-negative', 'I-negative']
+
 def estimate_emission_params(training_data):
     """
     Takes a training data file formatted with lines like
@@ -8,8 +10,6 @@ def estimate_emission_params(training_data):
     where the [symbol][word] element gives the emission probability
     for that word from that symbol
     """
-
-    symbols = ['START', 'STOP', 'O', 'B-positive', 'I-positive', 'B-neutral', 'I-neutral', 'B-negative', 'I-negative']
 
     # initialize dictionary of counts
     symbol_word_counts = {}
@@ -38,3 +38,24 @@ def estimate_emission_params(training_data):
             emission_probabilities[symbol][word] = float(symbol_word_counts[symbol][word])/symbol_counts[symbol] + 1
 
     return emission_probabilities
+
+def find_symbol_estimate(dev_file, emission_probabilities):
+    #using dev.in
+    predicted_symbols = []
+    with open(dev_file) as f:
+        for line in f:
+            word = line.strip()
+            current_arg_max = symbols[0]
+            current_max = 0
+            for symbol in symbols:
+                if emission_probabilities[symbol][word] > current_max:
+                    current_arg_max = symbol
+                    current_max = emission_probabilities[symbol][word]
+            predicted_symbols.append(current_arg_max)
+
+    return predicted_symbols
+
+print("hi")
+e = estimate_emission_params("data/EN/train")
+predicted_symbols = find_symbol_estimate("data/EN/dev.in", e)
+print predicted_symbols

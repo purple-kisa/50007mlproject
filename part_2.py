@@ -60,7 +60,6 @@ def emission_probability(symbol, word, emission_probabilities, symbol_counts):
     we assign it a fixed probability based on the symbol count
     """
 
-    emission_probabilities = estimate_emission_params(training_data)
     unseen_word = True
 
     for sym in emission_probabilities:
@@ -70,10 +69,12 @@ def emission_probability(symbol, word, emission_probabilities, symbol_counts):
     if unseen_word:
         return 1/(1 + symbol_counts[symbol])
     else:
-        emission_probabilities[symbol][word]
+        if word in emission_probabilities[symbol]:
+            return emission_probabilities[symbol][word]
+        else:
+            return 0
 
-def find_symbol_estimate(dev_file, emission_probabilities):
-    # using dev.in
+def find_symbol_estimate(dev_file, emission_probabilities, symbol_counts):
     predicted_symbols = []
     with open(dev_file) as f:
         for line in f:
@@ -81,10 +82,9 @@ def find_symbol_estimate(dev_file, emission_probabilities):
             current_arg_max = symbols[0]
             current_max = 0
             for symbol in symbols:
-                print(word, symbol,emission_probabilities[symbol][word])
-                if emission_probabilities[symbol][word] > current_max:
+                if emission_probability(symbol, word, emission_probabilities, symbol_counts) > current_max:
                     current_arg_max = symbol
-                    current_max = emission_probabilities[symbol][word]
+                    current_max = emission_probability(symbol,word, emission_probabilities, symbol_counts)
             predicted_symbols.append(current_arg_max)
 
     return predicted_symbols
@@ -114,22 +114,23 @@ def get_entity_count(symbol_sequence):
 
     return entity_count
 
-def compute_precision(predicted_symbols, gold_standard):
+def compute_precision_and_recall(predicted_symbols, gold_standard):
     correct_count = 0
     inside_entity = False
     correctly_predicted = False
 
     for i, gold_symbol in enumerate(gold_standard):
         if inside_entity:
-            if gold_symbol != predicted_symbols[i]:
-                correctly_predicted = False
-
             # if we move out of an entity
             if gold_symbol[0] != 'I':
                 if correctly_predicted:
                     correct_count += 1
                 if gold_symbol[0] == 'O':
                     inside_entity = False
+
+            if gold_symbol != predicted_symbols[i]:
+                correctly_predicted = False
+
         else:
             if gold_symbol[0] != 'O':
                 inside_entity = True
@@ -138,18 +139,45 @@ def compute_precision(predicted_symbols, gold_standard):
                 else:
                     correctly_predicted = True
 
-    return correct_count
+    precision = float(correct_count)/get_entity_count(predicted_symbols)
+    recall = float(correct_count)/get_entity_count(gold_standard)
+    return precision, recall
 
+def compute_f_score(precision, recall):
+    return 2/((1/precision)+(1/recall))
 
+def get_f_score_recall_and_precision(training_data, dev_in, dev_out):
+    """
+    :param training_data:
+    :param dev_in:
+    :param dev_out:
+    :return: precision and recall for dev_in based on emission probabilities from training_data; gold standard is taken from dev_out
+    """
+    symbol_word_counts, symbol_counts = get_symbol_word_counts(training_data)
+    emission_probabilities = estimate_emission_params(symbol_word_counts, symbol_counts)
+    predicted_symbols = find_symbol_estimate(dev_in, emission_probabilities, symbol_counts)
+    gold_standard = get_symbol_sequence(dev_out)
 
-e = estimate_emission_params("data/EN/train")
-predicted_symbols = find_symbol_estimate("data/EN/dev.in", e)
-gold_standard = get_symbol_sequence('data/EN/dev.out')
-test_sequence = ['B-p', 'I', 'O', 'O', 'I', 'I', 'B', 'O', 'I', 'B', 'B', 'B', 'B', 'O', 'I', 'O']
-print(get_entity_count(test_sequence))
-print(get_entity_count(predicted_symbols))
-print(compute_precision(predicted_symbols, gold_standard))
+    precision,recall = compute_precision_and_recall(predicted_symbols, gold_standard)
+    f_score = compute_f_score(precision,recall)
+    return f_score, precision, recall
 
-test_e = estimate_emission_params('data/test')
-print(find_symbol_estimate('data/test_dev', test_e))
-print(test_e)
+print(get_f_score_recall_and_precision("data/EN/train", "data/EN/dev.in", "data/EN/dev.out"))
+
+# gold_standard = get_symbol_sequence('data/EN/dev.out')
+# test_sequence = ['B-p', 'I', 'O', 'O', 'I', 'I', 'B', 'O', 'I', 'B', 'B', 'B', 'B', 'O', 'I', 'O']
+# print(get_entity_count(test_sequence))
+#
+# symbol_word_counts, symbol_counts = get_symbol_word_counts('data/test')
+# test_e = estimate_emission_params(symbol_word_counts, symbol_counts)
+# print("Test_e",test_e)
+# print("Symbol estimate",find_symbol_estimate("data/test_dev", test_e, symbol_counts))
+#
+# predicted_symbols = get_symbol_sequence("data/test")
+# print "Predicted symbols",predicted_symbols
+# print "Entity count", get_entity_count(predicted_symbols)
+# wrongly_predicted_symbols = predicted_symbols[:]
+# wrongly_predicted_symbols[-2] = "B-negative"
+# print "Entity count", get_entity_count(wrongly_predicted_symbols)
+#
+# print ("Precision",compute_precision_and_recall(wrongly_predicted_symbols, predicted_symbols))

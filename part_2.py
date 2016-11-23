@@ -18,7 +18,7 @@ def get_symbol_word_counts(training_data):
     for symbol in symbols:
         symbol_word_counts[symbol] = defaultdict(int)
 
-    with open(training_data) as f:
+    with open(training_data, encoding="utf8") as f:
         for line in f:
             if line.isspace():
                 continue
@@ -74,18 +74,28 @@ def emission_probability(symbol, word, emission_probabilities, symbol_counts):
         else:
             return 0
 
-def find_symbol_estimate(dev_file, emission_probabilities, symbol_counts):
+def find_symbol_estimate(dev_file, prediction_file, emission_probabilities, symbol_counts):
     predicted_symbols = []
-    with open(dev_file) as f:
+    with open(dev_file, encoding="utf8") as f:
         for line in f:
             word = line.strip()
             current_arg_max = symbols[0]
             current_max = 0
-            for symbol in symbols:
-                if emission_probability(symbol, word, emission_probabilities, symbol_counts) > current_max:
-                    current_arg_max = symbol
-                    current_max = emission_probability(symbol,word, emission_probabilities, symbol_counts)
-            predicted_symbols.append(current_arg_max)
+            if word!="":
+                for symbol in symbols:
+                    if emission_probability(symbol, word, emission_probabilities, symbol_counts) > current_max:
+                        current_arg_max = symbol
+                        current_max = emission_probability(symbol,word, emission_probabilities, symbol_counts)
+                predicted_symbols.append(current_arg_max)
+            else:
+                predicted_symbols.append("")
+
+    result_file = open(prediction_file, "w", encoding="utf8")
+
+    with open(dev_file, encoding="utf8") as f:
+        for i,line in enumerate(f):
+            word_label = line.strip() + " " + predicted_symbols[i] + "\n"
+            result_file.write(word_label)
 
     return predicted_symbols
 
@@ -162,7 +172,11 @@ def get_f_score_recall_and_precision(training_data, dev_in, dev_out):
     f_score = compute_f_score(precision,recall)
     return f_score, precision, recall
 
-print(get_f_score_recall_and_precision("data/EN/train", "data/EN/dev.in", "data/EN/dev.out"))
+# print(get_f_score_recall_and_precision("data/EN/train", "data/EN/dev.in", "data/EN/dev.out"))
+
+symbol_word_counts, symbol_counts = get_symbol_word_counts("data/EN/train")
+emission_probabilities = estimate_emission_params(symbol_word_counts, symbol_counts)
+print(find_symbol_estimate("data/EN/dev.in", "data/EN/dev.p2.out", emission_probabilities, symbol_counts))
 
 # gold_standard = get_symbol_sequence('data/EN/dev.out')
 # test_sequence = ['B-p', 'I', 'O', 'O', 'I', 'I', 'B', 'O', 'I', 'B', 'B', 'B', 'B', 'O', 'I', 'O']

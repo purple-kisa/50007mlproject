@@ -216,14 +216,17 @@ def compare_observed_to_predicted(observed, predicted):
 
 ##############Main Function##################
 
-if len(sys.argv) < 3:
-    print ('Please make sure you have installed Python 3.4 or above!')
-    print ("Usage on Windows:  python evalResult.py gold predictions")
-    print ("Usage on Linux/Mac:  python3 evalResult.py gold predictions")
-    sys.exit()
+# if len(sys.argv) < 3:
+#     print ('Please make sure you have installed Python 3.4 or above!')
+#     print ("Usage on Windows:  python evalResult.py gold predictions")
+#     print ("Usage on Linux/Mac:  python3 evalResult.py gold predictions")
+#     sys.exit()
 
-gold = open(sys.argv[1], "r", encoding='UTF-8')
-prediction = open(sys.argv[2], "r", encoding='UTF-8')
+# gold = open(sys.argv[1], "r", encoding='UTF-8')
+# prediction = open(sys.argv[2], "r", encoding='UTF-8')
+
+gold = open("data/EN/dev.out", "r", encoding='UTF-8')
+prediction = open("data/EN/dev.p2.out", "r", encoding='UTF-8')
 
 #column separator
 separator = ' '

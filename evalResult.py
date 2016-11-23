@@ -225,8 +225,8 @@ def compare_observed_to_predicted(observed, predicted):
 # gold = open(sys.argv[1], "r", encoding='UTF-8')
 # prediction = open(sys.argv[2], "r", encoding='UTF-8')
 
-gold = open("data/EN/dev.out", "r", encoding='UTF-8')
-prediction = open("data/EN/dev.p2.out", "r", encoding='UTF-8')
+gold = open("data/CN/dev.out", "r", encoding='UTF-8')
+prediction = open("data/CN/dev.p2.out", "r", encoding='UTF-8')
 
 #column separator
 separator = ' '

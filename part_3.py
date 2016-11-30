@@ -58,38 +58,91 @@ def estimate_transition_params(symbol_symbol_counts, symbol_counts):
 
     return transition_probabilities
 
-def viterbi(transition_probabiltiies, emission_probabilities, dev_file):
-    tweets = []
+def get_observation_sequences(dev_file):
+    sequences = []
     with open(dev_file) as f:
-        tweet = []
+        sequence = []
         for line in f:
-            if line!="":
-                word = line.strip()
-                tweet.append(word)
+            if line.isspace():
+                sequences.append(sequence)
+                sequence = []
             else:
-                tweets.append(tweet)
-                tweet=[]
+                word = line.strip()
+                sequence.append(word)
+        sequences.append(sequence)
+    return sequences
 
-    for tweet in tweets:
-        n = len(tweet)
-        scores = [[0 for i in range(len(symbols) + 2)] for j in range(n)]
-        optimal_symbols = [[0 for i in range(len(symbols) + 2)] for j in range(n)]
+def viterbi(transition_probabilities, emission_probabilities, symbol_counts, observation_sequences):
+   for sequence in observation_sequences:
+
+        # Initialize probability score and optimal symbol matrices
+        n = len(sequence)
+        scores = {}
+        optimal_symbols = {}
+        for k in range(n + 1):
+            scores[k] = {}
+            optimal_symbols[k] = {}
+            for symbol in symbols:
+                scores[k][symbol] = 0
+                optimal_symbols[k][symbol] = 0
+
+        # Set base case
         for symbol in symbols:
-            scores[0][symbol]=0
+            scores[0][symbol]= 0
+            scores[1][symbol] = transition_probabilities["START"][symbol] * emission_probability(symbol, sequence[0], emission_probabilities, symbol_counts)
             optimal_symbols[0][symbol]="START"
-        scores[0]["STOP"]=0
-        scores[0]["START"]=1
+            optimal_symbols[1][symbol]="START"
+        scores[0]["STOP"]= 0
+        scores[0]["START"]= 1
 
+        # Move forward recursively
+        for k in range(2, n + 2):
+            for v in symbols:
 
-    for k in range(1,n+1):
-        for v in range(len(symbols)):
-            u = scores[k-1].index(max(scores[k-1]))
-            scores[k][v] = max(scores[k-1]) * transition_probabiltiies[u][v] * emission_probability[v][]
+                # Get the max probability score
+                if k != n + 1: # k = n + 1 is the final case
+                    kth_word = sequence[k-1]
+                    probabilities = [scores[k-1][u] * transition_probabilities[u][v] * emission_probability(v, kth_word, emission_probabilities, symbol_counts) for u in symbols]
+                    scores[k][v] = max(probabilities)
 
+                # Get the optimal symbol
+                max_probability = 0
+                for u in symbols:
+                    probability = scores[k-1][u] * transition_probabilities[u][v]
+                    if probability >= max_probability:
+                        max_probability = probability
+                        argmax = u
+                if k == n + 1: # Final case
+                    optimal_symbols[k] = {}
+                    optimal_symbols[k]["STOP"] = argmax
+                    break
+                else:
+                    optimal_symbols[k][v] = argmax
+
+        # Predict symbol sequence
+        predicted_symbols = ["STOP"]
+        for k in range(n + 1, 0, -1):
+            predicted_symbols.insert(0, optimal_symbols[k][predicted_symbols[0]])
+
+        return predicted_symbols
+
+def decode_file(training_data, dev_in):
+    symbol_word_counts, symbol_counts = get_symbol_word_counts(training_data)
+    emission_probabilities = estimate_emission_params(symbol_word_counts, symbol_counts)
+
+    symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts(training_data)
+    transition_probabilities = estimate_transition_params(symbol_symbol_counts, symbol_counts)
+
+    observation_sequences = get_observation_sequences(dev_in)
+    predicted_symbols = viterbi(transition_probabilities, emission_probabilities, symbol_counts, observation_sequences)
+
+    print(predicted_symbols)
 
 
 symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts('data/test')
-print(symbol_symbol_counts)
-print(symbol_counts)
-print("TRANSITION PARAMS")
-print(estimate_transition_params(symbol_symbol_counts, symbol_counts))
+#  print(symbol_symbol_counts)
+#  print(symbol_counts)
+#  print("TRANSITION PARAMS")
+#  print(estimate_transition_params(symbol_symbol_counts, symbol_counts))
+
+decode_file('data/test', 'data/test_dev')

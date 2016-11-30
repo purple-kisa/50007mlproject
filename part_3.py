@@ -1,5 +1,13 @@
+import math
+import sys
 from part_2 import symbols, get_symbol_word_counts, estimate_emission_params, emission_probability
 from collections import defaultdict
+
+def log(x):
+    if x == 0:
+        return math.log(sys.float_info.min)
+    else:
+        return math.log(x)
 
 def get_symbol_symbol_counts(training_data):
     """
@@ -87,7 +95,7 @@ def viterbi(transition_probabilities, emission_probabilities, symbol_counts, obs
         # Set base case
         for symbol in symbols:
             scores_and_previous_symbols[0][symbol]= (0, "NA")
-            scores_and_previous_symbols[1][symbol] = (transition_probabilities["START"][symbol] * emission_probability(symbol, sequence[0], emission_probabilities, symbol_counts), "START")
+            scores_and_previous_symbols[1][symbol] = (log(transition_probabilities["START"][symbol]) + log(emission_probability(symbol, sequence[0], emission_probabilities, symbol_counts)), "START")
             #  optimal_symbols[0][symbol]="START"
             #  optimal_symbols[1][symbol]="START"
         scores_and_previous_symbols[0]["STOP"]= (0, "NA")
@@ -98,10 +106,10 @@ def viterbi(transition_probabilities, emission_probabilities, symbol_counts, obs
             for v in symbols:
                 # Get the max probability score
                 kth_word = sequence[k-1]
-                probabilities_and_previous_symbols = [(scores_and_previous_symbols[k-1][u][0] * transition_probabilities[u][v] * emission_probability(v, kth_word, emission_probabilities, symbol_counts), u) for u in symbols]
+                probabilities_and_previous_symbols = [(scores_and_previous_symbols[k-1][u][0] + log(transition_probabilities[u][v]) + log(emission_probability(v, kth_word, emission_probabilities, symbol_counts)), u) for u in symbols]
                 scores_and_previous_symbols[k][v] = max(probabilities_and_previous_symbols, key=lambda probability_and_previous_symbol: probability_and_previous_symbol[0])
 
-        probabilities_and_previous_symbols = [(scores_and_previous_symbols[n][u][0] * transition_probabilities[u]["STOP"], u) for u in symbols]
+        probabilities_and_previous_symbols = [(scores_and_previous_symbols[n][u][0] + log(transition_probabilities[u]["STOP"]), u) for u in symbols]
         scores_and_previous_symbols[n+1]["STOP"] = max(probabilities_and_previous_symbols, key=lambda probability_and_previous_symbol: probability_and_previous_symbol[0])
 
         # Predict symbol sequence
@@ -130,4 +138,4 @@ symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts('data/test')
 #  print("TRANSITION PARAMS")
 #  print(estimate_transition_params(symbol_symbol_counts, symbol_counts))
 
-#  decode_file('data/test', 'data/test_dev')
+decode_file('data/test', 'data/test_dev')

@@ -73,56 +73,41 @@ def get_observation_sequences(dev_file):
     return sequences
 
 def viterbi(transition_probabilities, emission_probabilities, symbol_counts, observation_sequences):
-   for sequence in observation_sequences:
+    for sequence in observation_sequences:
 
         # Initialize probability score and optimal symbol matrices
         n = len(sequence)
-        scores = {}
-        optimal_symbols = {}
+        scores_and_previous_symbols = {}
+        scores_and_previous_symbols[n+1] = {}
         for k in range(n + 1):
-            scores[k] = {}
-            optimal_symbols[k] = {}
+            scores_and_previous_symbols[k] = {}
             for symbol in symbols:
-                scores[k][symbol] = 0
-                optimal_symbols[k][symbol] = 0
+                scores_and_previous_symbols[k][symbol] = []
 
         # Set base case
         for symbol in symbols:
-            scores[0][symbol]= 0
-            scores[1][symbol] = transition_probabilities["START"][symbol] * emission_probability(symbol, sequence[0], emission_probabilities, symbol_counts)
-            optimal_symbols[0][symbol]="START"
-            optimal_symbols[1][symbol]="START"
-        scores[0]["STOP"]= 0
-        scores[0]["START"]= 1
+            scores_and_previous_symbols[0][symbol]= (0, "NA")
+            scores_and_previous_symbols[1][symbol] = (transition_probabilities["START"][symbol] * emission_probability(symbol, sequence[0], emission_probabilities, symbol_counts), "START")
+            #  optimal_symbols[0][symbol]="START"
+            #  optimal_symbols[1][symbol]="START"
+        scores_and_previous_symbols[0]["STOP"]= (0, "NA")
+        scores_and_previous_symbols[0]["START"]= (1, "NA")
 
         # Move forward recursively
-        for k in range(2, n + 2):
+        for k in range(2, n + 1):
             for v in symbols:
-
                 # Get the max probability score
-                if k != n + 1: # k = n + 1 is the final case
-                    kth_word = sequence[k-1]
-                    probabilities = [scores[k-1][u] * transition_probabilities[u][v] * emission_probability(v, kth_word, emission_probabilities, symbol_counts) for u in symbols]
-                    scores[k][v] = max(probabilities)
+                kth_word = sequence[k-1]
+                probabilities_and_previous_symbols = [(scores_and_previous_symbols[k-1][u][0] * transition_probabilities[u][v] * emission_probability(v, kth_word, emission_probabilities, symbol_counts), u) for u in symbols]
+                scores_and_previous_symbols[k][v] = max(probabilities_and_previous_symbols, key=lambda probability_and_previous_symbol: probability_and_previous_symbol[0])
 
-                # Get the optimal symbol
-                max_probability = 0
-                for u in symbols:
-                    probability = scores[k-1][u] * transition_probabilities[u][v]
-                    if probability >= max_probability:
-                        max_probability = probability
-                        argmax = u
-                if k == n + 1: # Final case
-                    optimal_symbols[k] = {}
-                    optimal_symbols[k]["STOP"] = argmax
-                    break
-                else:
-                    optimal_symbols[k][v] = argmax
+        probabilities_and_previous_symbols = [(scores_and_previous_symbols[n][u][0] * transition_probabilities[u]["STOP"], u) for u in symbols]
+        scores_and_previous_symbols[n+1]["STOP"] = max(probabilities_and_previous_symbols, key=lambda probability_and_previous_symbol: probability_and_previous_symbol[0])
 
         # Predict symbol sequence
         predicted_symbols = ["STOP"]
         for k in range(n + 1, 0, -1):
-            predicted_symbols.insert(0, optimal_symbols[k][predicted_symbols[0]])
+            predicted_symbols.insert(0, scores_and_previous_symbols[k][predicted_symbols[0]][1])
 
         return predicted_symbols
 
@@ -145,4 +130,4 @@ symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts('data/test')
 #  print("TRANSITION PARAMS")
 #  print(estimate_transition_params(symbol_symbol_counts, symbol_counts))
 
-decode_file('data/test', 'data/test_dev')
+#  decode_file('data/test', 'data/test_dev')

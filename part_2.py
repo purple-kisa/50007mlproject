@@ -128,4 +128,4 @@ symbol_word_counts, symbol_counts = get_symbol_word_counts("data/CN/train")
 emission_probabilities = estimate_emission_params(symbol_word_counts, symbol_counts)
 #  print(find_symbol_estimate("data/CN/dev.in", "data/CN/dev.p2.out", emission_probabilities, symbol_counts))
 
-print(get_symbol_word_counts('data/test')[0])
+#  print(get_symbol_word_counts('data/test')[0])

@@ -9,6 +9,7 @@ def log(x):
         return math.log(x)
 
 def top_m_viterbi(m, transition_probabilities, emission_probabilities, symbol_counts, observation_sequences):
+    all_top_m_paths = []
     for sequence in observation_sequences:
 
         # Initialize probability score and optimal symbol matrices
@@ -67,7 +68,9 @@ def top_m_viterbi(m, transition_probabilities, emission_probabilities, symbol_co
         probabilities_and_paths.sort(key=lambda probability_and_path: probability_and_path[0], reverse=True)
         top_m_scores_and_paths[n+1]["STOP"] = probabilities_and_paths[0:m]
 
-        return top_m_scores_and_paths[n+1]["STOP"]
+        all_top_m_paths.append(top_m_scores_and_paths[n+1]["STOP"])
+
+    return all_top_m_paths
 
 def top_m_decode_file(m, training_data, dev_in):
     symbol_word_counts, symbol_counts = get_symbol_word_counts(training_data)

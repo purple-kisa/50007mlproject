@@ -32,7 +32,7 @@ def get_symbol_symbol_counts(training_data):
 
     prev_symbol = 'START'
 
-    with open(training_data) as f:
+    with open(training_data, encoding="utf8") as f:
         for line in f:
             if line.isspace():
                 continue
@@ -68,19 +68,22 @@ def estimate_transition_params(symbol_symbol_counts, symbol_counts):
 
 def get_observation_sequences(dev_file):
     sequences = []
-    with open(dev_file) as f:
+    with open(dev_file, encoding="utf8") as f:
         sequence = []
         for line in f:
             if line.isspace():
-                sequences.append(sequence)
+                if sequence!=[]:
+                    sequences.append(sequence)
                 sequence = []
             else:
                 word = line.strip()
                 sequence.append(word)
-        sequences.append(sequence)
+        if sequence!=[]:
+            sequences.append(sequence)
     return sequences
 
 def viterbi(transition_probabilities, emission_probabilities, symbol_counts, observation_sequences):
+    all_predicted_symbols = []
     for sequence in observation_sequences:
 
         # Initialize probability score and optimal symbol matrices
@@ -91,6 +94,7 @@ def viterbi(transition_probabilities, emission_probabilities, symbol_counts, obs
             scores_and_previous_symbols[k] = {}
             for symbol in symbols:
                 scores_and_previous_symbols[k][symbol] = []
+
 
         # Set base case
         for symbol in symbols:
@@ -117,7 +121,9 @@ def viterbi(transition_probabilities, emission_probabilities, symbol_counts, obs
         for k in range(n + 1, 0, -1):
             predicted_symbols.insert(0, scores_and_previous_symbols[k][predicted_symbols[0]][1])
 
-        return predicted_symbols
+        all_predicted_symbols.append(predicted_symbols)
+
+    return all_predicted_symbols
 
 def decode_file(training_data, dev_in):
     symbol_word_counts, symbol_counts = get_symbol_word_counts(training_data)
@@ -130,6 +136,25 @@ def decode_file(training_data, dev_in):
     predicted_symbols = viterbi(transition_probabilities, emission_probabilities, symbol_counts, observation_sequences)
 
     print(predicted_symbols)
+    return predicted_symbols
+
+def add_predicted_symbols_to_file(predicted_symbols, dev_in, prediction_file):
+    result_file = open(prediction_file, "w", encoding="utf8")
+    symbols_list = []
+    for sequence_symbol in predicted_symbols:
+        for symbol in sequence_symbol:
+            if symbol!="START":
+                if symbol=="STOP":
+                    symbols_list.append("")
+                else:
+                    symbols_list.append(symbol)
+    print (symbols_list)
+
+    with open(dev_in, encoding="utf8") as f:
+        for i,line in enumerate(f):
+            word_label = line.strip() + " " + symbols_list[i] + "\n"
+            result_file.write(word_label)
+
 
 
 symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts('data/test')
@@ -139,3 +164,5 @@ symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts('data/test')
 #  print(estimate_transition_params(symbol_symbol_counts, symbol_counts))
 
 decode_file('data/test', 'data/test_dev')
+predicted_symbols = decode_file('data/CN/train', 'data/CN/dev.in')
+add_predicted_symbols_to_file(predicted_symbols, 'data/CN/dev.in', 'data/CN/dev.p3.out')

@@ -42,7 +42,7 @@ def get_symbol_symbol_counts(training_data):
 
 def estimate_transition_params(symbol_symbol_counts, symbol_counts):
     """
-    Retruns a nested dictionary of transition probabilities
+    Returns a nested dictionary of transition probabilities
     where the value of d[symbol1][symbol2] is the probability
     of transitioning from symbol1 to symbol2
     """
@@ -59,8 +59,34 @@ def estimate_transition_params(symbol_symbol_counts, symbol_counts):
     return transition_probabilities
 
 def viterbi(transition_probabiltiies, emission_probabilities, dev_file):
-    n = sum([1 for line in open(dev_file)])
-    scores = [ [0 for i in range(len(symbols))] for j in range(n)]
+    tweets = []
+    with open(dev_file) as f:
+        tweet = []
+        for line in f:
+            if line!="":
+                word = line.strip()
+                tweet.append(word)
+            else:
+                tweets.append(tweet)
+                tweet=[]
+
+    for tweet in tweets:
+        n = len(tweet)
+        scores = [[0 for i in range(len(symbols) + 2)] for j in range(n)]
+        optimal_symbols = [[0 for i in range(len(symbols) + 2)] for j in range(n)]
+        for symbol in symbols:
+            scores[0][symbol]=0
+            optimal_symbols[0][symbol]="START"
+        scores[0]["STOP"]=0
+        scores[0]["START"]=1
+
+
+    for k in range(1,n+1):
+        for v in range(len(symbols)):
+            u = scores[k-1].index(max(scores[k-1]))
+            scores[k][v] = max(scores[k-1]) * transition_probabiltiies[u][v] * emission_probability[v][]
+
+
 
 symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts('data/test')
 print(symbol_symbol_counts)

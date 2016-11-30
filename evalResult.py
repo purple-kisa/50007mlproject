@@ -225,9 +225,9 @@ def compare_observed_to_predicted(observed, predicted):
 # gold = open(sys.argv[1], "r", encoding='UTF-8')
 # prediction = open(sys.argv[2], "r", encoding='UTF-8')
 
-print("-------------")
-print("---EN DATA---")
-print("-------------")
+print("----------------")
+print("---EN P2 DATA---")
+print("----------------")
 gold = open("data/EN/dev.out", "r", encoding='UTF-8')
 prediction = open("data/EN/dev.p2.out", "r", encoding='UTF-8')
 
@@ -245,9 +245,9 @@ predicted = get_predicted(prediction)
 #Compare
 compare_observed_to_predicted(observed, predicted)
 
-print("\n-------------")
-print("---ES DATA---")
-print("-------------")
+print("\n----------------")
+print("---ES P2 DATA---")
+print("----------------")
 gold = open("data/ES/dev.out", "r", encoding='UTF-8')
 prediction = open("data/ES/dev.p2.out", "r", encoding='UTF-8')
 
@@ -265,9 +265,9 @@ predicted = get_predicted(prediction)
 #Compare
 compare_observed_to_predicted(observed, predicted)
 
-print("\n-------------")
-print("---SG DATA---")
-print("-------------")
+print("\n----------------")
+print("---SG P2 DATA---")
+print("----------------")
 
 gold = open("data/SG/dev.out", "r", encoding='UTF-8')
 prediction = open("data/SG/dev.p2.out", "r", encoding='UTF-8')
@@ -286,9 +286,9 @@ predicted = get_predicted(prediction)
 #Compare
 compare_observed_to_predicted(observed, predicted)
 
-print("\n-------------")
-print("---CN DATA---")
-print("-------------")
+print("\n----------------")
+print("---CN P2 DATA---")
+print("----------------")
 gold = open("data/CN/dev.out", "r", encoding='UTF-8')
 prediction = open("data/CN/dev.p2.out", "r", encoding='UTF-8')
 
@@ -306,3 +306,83 @@ predicted = get_predicted(prediction)
 #Compare
 compare_observed_to_predicted(observed, predicted)
 
+print("\n----------------")
+print("---EN P3 DATA---")
+print("----------------")
+gold = open("data/EN/dev.out", "r", encoding='UTF-8')
+prediction = open("data/EN/dev.p3.out", "r", encoding='UTF-8')
+
+#column separator
+separator = ' '
+
+#the column index for tags
+outputColumnIndex = 1
+#Read Gold data
+observed = get_observed(gold)
+
+#Read Predction data
+predicted = get_predicted(prediction)
+
+#Compare
+compare_observed_to_predicted(observed, predicted)
+
+print("\n----------------")
+print("---ES P3 DATA---")
+print("----------------")
+gold = open("data/ES/dev.out", "r", encoding='UTF-8')
+prediction = open("data/ES/dev.p3.out", "r", encoding='UTF-8')
+
+#column separator
+separator = ' '
+
+#the column index for tags
+outputColumnIndex = 1
+#Read Gold data
+observed = get_observed(gold)
+
+#Read Predction data
+predicted = get_predicted(prediction)
+
+#Compare
+compare_observed_to_predicted(observed, predicted)
+
+print("\n----------------")
+print("---SG P3 DATA---")
+print("----------------")
+
+gold = open("data/SG/dev.out", "r", encoding='UTF-8')
+prediction = open("data/SG/dev.p3.out", "r", encoding='UTF-8')
+
+#column separator
+separator = ' '
+
+#the column index for tags
+outputColumnIndex = 1
+#Read Gold data
+observed = get_observed(gold)
+
+#Read Predction data
+predicted = get_predicted(prediction)
+
+#Compare
+compare_observed_to_predicted(observed, predicted)
+
+print("\n----------------")
+print("---CN P3 DATA---")
+print("----------------")
+gold = open("data/CN/dev.out", "r", encoding='UTF-8')
+prediction = open("data/CN/dev.p3.out", "r", encoding='UTF-8')
+
+#column separator
+separator = ' '
+
+#the column index for tags
+outputColumnIndex = 1
+#Read Gold data
+observed = get_observed(gold)
+
+#Read Predction data
+predicted = get_predicted(prediction)
+
+#Compare
+compare_observed_to_predicted(observed, predicted)

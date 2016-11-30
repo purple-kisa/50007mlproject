@@ -74,55 +74,60 @@ def emission_probability(symbol, word, emission_probabilities, symbol_counts):
         else:
             return 0
 
-def find_symbol_estimate(dev_file, prediction_file, emission_probabilities, symbol_counts):
-    predicted_symbols = []
+def find_symbol_estimate(dev_file, emission_probabilities, symbol_counts):
+    predicted_word_symbol_sequence = []
     with open(dev_file, encoding="utf8") as f:
         for line in f:
-            word = line.strip()
-            current_arg_max = symbols[0]
-            current_max = 0
-            if word!="":
-                for symbol in symbols:
-                    if emission_probability(symbol, word, emission_probabilities, symbol_counts) > current_max:
-                        current_arg_max = symbol
-                        current_max = emission_probability(symbol,word, emission_probabilities, symbol_counts)
-                predicted_symbols.append(current_arg_max)
+            if not line.isspace():
+                word = line.strip()
+                scores_and_symbols = [(emission_probability(symbol, word, emission_probabilities, symbol_counts), symbol) for symbol in symbols]
+                argmax = max(scores_and_symbols, key=lambda score_and_symbol: score_and_symbol[0])[1]
+                predicted_word_symbol_sequence.append((word, argmax))
+
+                #  current_arg_max = symbols[0]
+                #  current_max = 0
+                #  for symbol in symbols:
+                    #  if emission_probability(symbol, word, emission_probabilities, symbol_counts) > current_max:
+                        #  current_arg_max = symbol
+                        #  current_max = emission_probability(symbol,word, emission_probabilities, symbol_counts)
+                #  predicted_word_symbol_sequence.append(current_arg_max)
+
             else:
-                predicted_symbols.append("")
+                predicted_word_symbol_sequence.append(('',''))
 
-    result_file = open(prediction_file, "w", encoding="utf8")
+    return predicted_word_symbol_sequence
 
-    with open(dev_file, encoding="utf8") as f:
-        for i,line in enumerate(f):
-            word_label = line.strip() + " " + predicted_symbols[i] + "\n"
-            result_file.write(word_label)
+def write_part_2_dev_out(filename, predicted_word_symbol_sequence):
+    result_file = open(filename, "w", encoding="utf8")
 
-    return predicted_symbols
+    for word_and_symbol in predicted_word_symbol_sequence:
+        result_file.write(' '.join(word_and_symbol) + "\n")
 
-def get_symbol_sequence(dev_out_file):
-    with open(dev_out_file) as f:
-        return [line.split(' ')[-1].strip() for line in f if not line.isspace()]
+# Used to be for evaluation
+#  def get_symbol_sequence(dev_out_file):
+    #  with open(dev_out_file) as f:
+        #  return [line.split(' ')[-1].strip() for line in f if not line.isspace()]
 
-def get_entity_count(symbol_sequence):
-    entity_count = 0
-    inside_entity = False
+#  def get_entity_count(symbol_sequence):
+    #  entity_count = 0
+    #  inside_entity = False
 
-    for symbol in symbol_sequence:
-        if inside_entity:
-            if symbol[0] != 'I':
-                entity_count += 1
-                if symbol[0] == 'O':
-                    inside_entity = False
-        else:
-            if symbol[0] != 'O':
-                inside_entity = True
+    #  for symbol in symbol_sequence:
+        #  if inside_entity:
+            #  if symbol[0] != 'I':
+                #  entity_count += 1
+                #  if symbol[0] == 'O':
+                    #  inside_entity = False
+        #  else:
+            #  if symbol[0] != 'O':
+                #  inside_entity = True
 
-    # In case our sequence ends with an entity
-    # we need to count this last entity
-    if symbol[0] != 'O':
-        entity_count += 1
+    #  # In case our sequence ends with an entity
+    #  # we need to count this last entity
+    #  if symbol[0] != 'O':
+        #  entity_count += 1
 
-    return entity_count
+    #  return entity_count
 
 symbol_word_counts, symbol_counts = get_symbol_word_counts("data/CN/train")
 emission_probabilities = estimate_emission_params(symbol_word_counts, symbol_counts)

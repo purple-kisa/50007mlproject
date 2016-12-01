@@ -2,7 +2,7 @@ from collections import defaultdict
 
 symbols = ['O', 'B-positive', 'I-positive', 'B-neutral', 'I-neutral', 'B-negative', 'I-negative']
 
-def get_symbol_word_counts(training_data):
+def get_symbol_word_counts(training_file):
     """
     Takes a training data file formatted with lines like
     (word) (symbol)
@@ -18,7 +18,7 @@ def get_symbol_word_counts(training_data):
     for symbol in symbols:
         symbol_word_counts[symbol] = defaultdict(int)
 
-    with open(training_data, encoding="utf8") as f:
+    with open(training_file, encoding="utf8") as f:
         for line in f:
             if line.isspace():
                 continue
@@ -50,6 +50,15 @@ def estimate_emission_params(symbol_word_counts, symbol_counts):
             emission_probabilities[symbol][word] = float(symbol_word_counts[symbol][word])/(symbol_counts[symbol] + 1)
 
     return emission_probabilities
+
+def get_emission_probabilities(training_file):
+    """
+    Returns a nested dictionary of emission probabilities
+    from a given training file
+    """
+
+    symbol_word_counts, symbol_counts = get_symbol_word_counts(training_file)
+    return estimate_emission_params(symbol_word_counts, symbol_counts)
 
 def emission_probability(symbol, word, emission_probabilities, symbol_counts):
     """
@@ -83,15 +92,6 @@ def find_symbol_estimate(dev_file, emission_probabilities, symbol_counts):
                 scores_and_symbols = [(emission_probability(symbol, word, emission_probabilities, symbol_counts), symbol) for symbol in symbols]
                 argmax = max(scores_and_symbols, key=lambda score_and_symbol: score_and_symbol[0])[1]
                 predicted_word_symbol_sequence.append((word, argmax))
-
-                #  current_arg_max = symbols[0]
-                #  current_max = 0
-                #  for symbol in symbols:
-                    #  if emission_probability(symbol, word, emission_probabilities, symbol_counts) > current_max:
-                        #  current_arg_max = symbol
-                        #  current_max = emission_probability(symbol,word, emission_probabilities, symbol_counts)
-                #  predicted_word_symbol_sequence.append(current_arg_max)
-
             else:
                 predicted_word_symbol_sequence.append(('',''))
 

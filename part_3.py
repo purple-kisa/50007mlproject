@@ -66,6 +66,10 @@ def estimate_transition_params(symbol_symbol_counts, symbol_counts):
 
     return transition_probabilities
 
+def get_transition_probabilities(training_file):
+    symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts(training_file)
+    return estimate_transition_params(symbol_symbol_counts, symbol_counts)
+
 def get_observation_sequences(dev_file):
     sequences = []
     with open(dev_file, encoding="utf8") as f:

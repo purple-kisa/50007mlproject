@@ -33,7 +33,8 @@ def top_m_viterbi(m, transition_probabilities, emission_probabilities, symbol_co
             for v in symbols:
                 # Get the k highest probability scores and associated previous symbols
                 kth_word = sequence[k-1]
-                probabilities_and_previous_symbols = [(score_and_symbol[0] + log(transition_probabilities[u][v]) + log(emission_probability(v, kth_word, emission_probabilities, symbol_counts)), u) for u in symbols for score_and_symbol in scores[k-1][u]]
+                probabilities_and_previous_symbols = [(max([score_and_symbol[0] + log(transition_probabilities[u][v]) + log(emission_probability(v, kth_word, emission_probabilities, symbol_counts)) for score_and_symbol in scores[k-1][u]]), u) for u in symbols]
+                # Eliminate duplicate scores
                 probabilities_and_previous_symbols.sort(key=lambda probability_and_previous_symbol: probability_and_previous_symbol[0], reverse=True)
                 scores[k][v] = probabilities_and_previous_symbols[0:m]
 
@@ -60,6 +61,9 @@ def top_m_viterbi(m, transition_probabilities, emission_probabilities, symbol_co
             for v in symbols:
                 kth_word = sequence[k-1]
                 probabilities_and_paths = [(score_and_symbol[0] + score_and_path[0], score_and_path[1] + [score_and_symbol[1]]) for score_and_symbol in scores[k][v] for score_and_path in top_m_scores_and_paths[k-1][score_and_symbol[1]]]
+                # Eliminate duplicate paths
+                probabilities_and_paths = set([(probability_and_path[0], ' '.join(probability_and_path[1])) for probability_and_path in probabilities_and_paths])
+                probabilities_and_paths = [(probability_and_path[0], probability_and_path[1].split()) for probability_and_path in probabilities_and_paths]
                 probabilities_and_paths.sort(key=lambda probability_and_path: probability_and_path[0], reverse=True)
                 top_m_scores_and_paths[k][v] = probabilities_and_paths[0:m]
 

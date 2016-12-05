@@ -140,7 +140,6 @@ def decode_file(training_data, dev_in):
     predicted_symbols = viterbi(transition_probabilities, emission_probabilities, symbol_counts, observation_sequences)
 
     print(predicted_symbols)
-    return predicted_symbols
 
 def add_predicted_symbols_to_file(predicted_symbols, dev_in, prediction_file):
     result_file = open(prediction_file, "w", encoding="utf8")
@@ -167,6 +166,6 @@ symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts('data/test')
 #  print("TRANSITION PARAMS")
 #  print(estimate_transition_params(symbol_symbol_counts, symbol_counts))
 
-decode_file('data/test', 'data/test_dev')
-predicted_symbols = decode_file('data/CN/train', 'data/CN/dev.in')
-add_predicted_symbols_to_file(predicted_symbols, 'data/CN/dev.in', 'data/CN/dev.p3.out')
+#  decode_file('data/test', 'data/test_dev')
+#  predicted_symbols = decode_file('data/CN/train', 'data/CN/dev.in')
+#  add_predicted_symbols_to_file(predicted_symbols, 'data/CN/dev.in', 'data/CN/dev.p3.out')

@@ -86,6 +86,24 @@ def top_m_decode_file(m, training_data, dev_in):
     observation_sequences = get_observation_sequences(dev_in)
     top_m_paths = top_m_viterbi(m, transition_probabilities, emission_probabilities, symbol_counts, observation_sequences)
 
+    print("top m paths")
     print(top_m_paths)
+    return top_m_paths
 
-top_m_decode_file(3, 'data/test', 'data/test_dev')
+def write_part_4_dev_out(predicted_symbols, dev_in, prediction_file):
+    result_file = open(prediction_file, "w", encoding="utf8")
+    symbols_list = []
+
+    for sequence_symbol in predicted_symbols:
+        symbols = sequence_symbol[4][1]
+        for symbol in range(1, len(symbols)):
+            symbols_list.append(symbols[symbol])
+        symbols_list.append("")
+
+    with open(dev_in, encoding="utf8") as f:
+        for i,line in enumerate(f):
+            word_label = line.strip() + " " + symbols_list[i] + "\n"
+            result_file.write(word_label)
+
+top_5 = top_m_decode_file(5, 'data/EN/train', 'data/EN/dev.in')
+write_part_4_dev_out(top_5, 'data/EN/dev.in', 'data/EN/dev.p4.out')

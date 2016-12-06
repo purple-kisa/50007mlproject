@@ -66,8 +66,8 @@ def estimate_transition_params(symbol_symbol_counts, symbol_counts):
 
     return transition_probabilities
 
-def get_transition_probabilities(training_file):
-    symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts(training_file)
+def get_transition_probabilities(training_data):
+    symbol_symbol_counts, symbol_counts = get_symbol_symbol_counts(training_data)
     return estimate_transition_params(symbol_symbol_counts, symbol_counts)
 
 def get_observation_sequences(dev_file):
@@ -99,13 +99,10 @@ def viterbi(transition_probabilities, emission_probabilities, symbol_counts, obs
             for symbol in symbols:
                 scores_and_previous_symbols[k][symbol] = []
 
-
         # Set base case
         for symbol in symbols:
             scores_and_previous_symbols[0][symbol]= (0, "NA")
             scores_and_previous_symbols[1][symbol] = (log(transition_probabilities["START"][symbol]) + log(emission_probability(symbol, sequence[0], emission_probabilities, symbol_counts)), "START")
-            #  optimal_symbols[0][symbol]="START"
-            #  optimal_symbols[1][symbol]="START"
         scores_and_previous_symbols[0]["STOP"]= (0, "NA")
         scores_and_previous_symbols[0]["START"]= (1, "NA")
 

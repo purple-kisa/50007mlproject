@@ -88,4 +88,4 @@ def top_m_decode_file(m, training_data, dev_in):
 
     print(top_m_paths)
 
-top_m_decode_file(3, 'data/test', 'data/test_dev')
+#  top_m_decode_file(3, 'data/test', 'data/test_dev')

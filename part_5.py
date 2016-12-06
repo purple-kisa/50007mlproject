@@ -1,7 +1,8 @@
+import re
 from part_4 import symbols, get_symbol_word_counts, get_symbol_symbol_counts, estimate_emission_params, emission_probability, estimate_transition_params, get_observation_sequences, top_m_viterbi, log
 
 # We try to learn a second order Markov model,
-# where the transition probabilities are now conidtioned on the previous two states # instead of just the previous state
+# where the transition probabilities are now conditioned on the previous two states # instead of just the previous state
 
 def get_symbol_symbol_symbol_counts(training_data):
     """
@@ -164,6 +165,30 @@ def decode_file(training_data, dev_in):
 
     print(predicted_symbols)
 
+
+def pre_process(data_file):
+    with open(data_file+'_processed', 'w') as output_f:
+        file_text = ''
+        with open(data_file, encoding='utf8') as f:
+            for line in f:
+                if line.isspace():
+                    file_text += '\n'
+                else:
+                    word = line.split()[0]
+                    new = line.replace(word, word.lower())
+                    file_text += new
+
+        processed_text = re.sub('@\w+', '', file_text)
+        processed_text = re.sub('#\w+', '', processed_text)
+        output_f.write(processed_text)
+
 #  decode_file('data/test', 'data/test_dev')
 #  decode_file('data/EN/train', 'data/EN/dev.in')
 #  decode_file('data/ES/train', 'data/ES/dev.in')
+pre_process('data/EN/dev.in')
+pre_process('data/ES/train')
+pre_process('data/ES/dev.in')
+pre_process('data/CN/train')
+pre_process('data/CN/dev.in')
+pre_process('data/SG/train')
+pre_process('data/SG/dev.in')

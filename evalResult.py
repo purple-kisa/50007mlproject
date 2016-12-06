@@ -426,3 +426,83 @@ predicted = get_predicted(prediction)
 
 #Compare
 compare_observed_to_predicted(observed, predicted)
+
+print("\n----------------")
+print("---EN P4 DATA--- (not processed)")
+print("----------------")
+gold = open("data/EN/dev.out", "r", encoding='UTF-8')
+prediction = open("data/EN/dev.p4_notprocessed.out", "r", encoding='UTF-8')
+
+#column separator
+separator = ' '
+
+#the column index for tags
+outputColumnIndex = 1
+#Read Gold data
+observed = get_observed(gold)
+
+#Read Predction data
+predicted = get_predicted(prediction)
+
+#Compare
+compare_observed_to_predicted(observed, predicted)
+
+print("\n----------------")
+print("---ES P4 DATA--- (not processed)")
+print("----------------")
+gold = open("data/ES/dev.out", "r", encoding='UTF-8')
+prediction = open("data/ES/dev.p4_notprocessed.out", "r", encoding='UTF-8')
+
+#column separator
+separator = ' '
+
+#the column index for tags
+outputColumnIndex = 1
+#Read Gold data
+observed = get_observed(gold)
+
+#Read Predction data
+predicted = get_predicted(prediction)
+
+#Compare
+compare_observed_to_predicted(observed, predicted)
+
+print("\n----------------")
+print("---EN P5 DATA---")
+print("----------------")
+gold = open("data/EN/dev.out", "r", encoding='UTF-8')
+prediction = open("data/EN/dev.p5.out", "r", encoding='UTF-8')
+
+#column separator
+separator = ' '
+
+#the column index for tags
+outputColumnIndex = 1
+#Read Gold data
+observed = get_observed(gold)
+
+#Read Predction data
+predicted = get_predicted(prediction)
+
+#Compare
+compare_observed_to_predicted(observed, predicted)
+
+print("\n----------------")
+print("---ES P5 DATA---")
+print("----------------")
+gold = open("data/ES/dev.out", "r", encoding='UTF-8')
+prediction = open("data/ES/dev.p5.out", "r", encoding='UTF-8')
+
+#column separator
+separator = ' '
+
+#the column index for tags
+outputColumnIndex = 1
+#Read Gold data
+observed = get_observed(gold)
+
+#Read Predction data
+predicted = get_predicted(prediction)
+
+#Compare
+compare_observed_to_predicted(observed, predicted)

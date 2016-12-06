@@ -164,39 +164,71 @@ def decode_file(training_data, dev_in):
     predicted_symbols = second_order_viterbi(second_order_transition_probabilities, emission_probabilities, symbol_symbol_counts, symbol_counts, observation_sequences)
 
     print(predicted_symbols)
+    return predicted_symbols
 
 
 def pre_process(data_file):
-    with open(data_file+'_processed', 'w') as output_f:
+    with open(data_file+'_processed', 'w', encoding='utf8') as output_f:
         file_text = ''
         with open(data_file, encoding='utf8') as f:
             for line in f:
                 if line.isspace():
                     file_text += '\n'
                 else:
-                    word = line.split()[0]
-                    new = line.replace(word, word.lower())
+                    word = line.split(" ")[0]
+                    if len(line.split())==2:
+                        new = word.lower() + " " + line.split(" ")[1]
+                    else:
+                        new = word.lower()
                     file_text += new
 
         processed_text = re.sub('@(\w+)', r'\1', file_text)
         processed_text = re.sub('#(\w+)', r'\1', processed_text)
         output_f.write(processed_text)
 
+def add_predicted_symbols_to_file(predicted_symbols, dev_in, prediction_file):
+    result_file = open(prediction_file, "w", encoding="utf8")
+    symbols_list = []
+    for sequence_symbol in predicted_symbols:
+        for symbol in sequence_symbol:
+            if symbol != "START":
+                if symbol == "STOP":
+                    symbols_list.append("")
+                else:
+                    symbols_list.append(symbol)
+    print(symbols_list)
+
+    with open(dev_in, encoding="utf8") as f:
+        for i, line in enumerate(f):
+            word_label = line.strip() + " " + symbols_list[i] + "\n"
+            result_file.write(word_label)
+
 #  decode_file('data/test', 'data/test_dev')
 #  decode_file('data/EN/train', 'data/EN/dev.in')
-#  decode_file('data/ES/train', 'data/ES/dev.in')
-pre_process('data/EN/train')
-pre_process('data/EN/dev.in')
+predicted_symbols = decode_file('data/EN/train_processed', 'data/EN/dev.in_processed')
+add_predicted_symbols_to_file(predicted_symbols, 'data/EN/dev.in', 'data/EN/dev.p5.out')
 
-pre_process('data/ES/train')
-pre_process('data/ES/dev.in')
+predicted_symbols = decode_file('data/ES/train_processed', 'data/ES/dev.in_processed')
+add_predicted_symbols_to_file(predicted_symbols, 'data/ES/dev.in', 'data/ES/dev.p5.out')
 
-pre_process('data/CN/train')
-pre_process('data/CN/dev.in')
+predicted_symbols = decode_file('data/EN/train_processed', 'data/p5_test/EN/test.in_processed')
+add_predicted_symbols_to_file(predicted_symbols, 'data/p5_test/EN/test.in_processed', 'data/EN/test.p5.out')
 
-pre_process('data/SG/train')
-pre_process('data/SG/dev.in')
+predicted_symbols = decode_file('data/ES/train_processed', 'data/p5_test/ES/test.in_processed')
+add_predicted_symbols_to_file(predicted_symbols, 'data/p5_test/ES/test.in_processed', 'data/ES/test.p5.out')
 
-pre_process('data/p5_test/EN/test.in')
-
-pre_process('data/p5_test/ES/test.in')
+# pre_process('data/EN/train')
+# pre_process('data/EN/dev.in')
+#
+# pre_process('data/ES/train')
+# pre_process('data/ES/dev.in')
+#
+# pre_process('data/CN/train')
+# pre_process('data/CN/dev.in')
+#
+# pre_process('data/SG/train')
+# pre_process('data/SG/dev.in')
+#
+# pre_process('data/p5_test/EN/test.in')
+#
+# pre_process('data/p5_test/ES/test.in')

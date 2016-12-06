@@ -103,7 +103,7 @@ def second_order_viterbi(second_order_transition_probabilities, emission_probabi
             for symbol in symbols:
                 first_observation_transition_probability = symbol_symbol_counts['START'][symbol1]
                 scores_and_previous_symbols[1]['START'][symbol] = (log(first_observation_transition_probability) + log(emission_probability(symbol, sequence[0], emission_probabilities, symbol_counts)), 'START', 'NA')
-            predicted_symbols = [max([(scores_and_previous_symbols[1]['START'][symbol], symbol) for symbol in symbols], key=lambda score_and_previous_symbol : score_and_previous_symbol[0])[1]]
+            predicted_symbols = ['START', max([(scores_and_previous_symbols[1]['START'][symbol], symbol) for symbol in symbols], key=lambda score_and_previous_symbol : score_and_previous_symbol[0])[1], 'STOP']
             all_predicted_symbols.append(predicted_symbols)
             continue
 
@@ -186,9 +186,16 @@ def pre_process(data_file):
 #  decode_file('data/EN/train', 'data/EN/dev.in')
 #  decode_file('data/ES/train', 'data/ES/dev.in')
 pre_process('data/EN/dev.in')
+
 pre_process('data/ES/train')
 pre_process('data/ES/dev.in')
+
 pre_process('data/CN/train')
 pre_process('data/CN/dev.in')
+
 pre_process('data/SG/train')
 pre_process('data/SG/dev.in')
+
+pre_process('data/p5_test/EN/test.in')
+
+pre_process('data/p5_test/ES/test.in')

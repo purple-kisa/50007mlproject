@@ -1,8 +1,7 @@
 from part_4 import symbols, get_symbol_word_counts, get_symbol_symbol_counts, estimate_emission_params, emission_probability, estimate_transition_params, get_observation_sequences, top_m_viterbi, log
 
 # We try to learn a second order Markov model,
-# where the transition probabilities are now conidtioned on the previous two states
-# instead of just the previous state
+# where the transition probabilities are now conidtioned on the previous two states # instead of just the previous state
 
 def get_symbol_symbol_symbol_counts(training_data):
     """
@@ -99,6 +98,14 @@ def second_order_viterbi(second_order_transition_probabilities, emission_probabi
                 for symbol2 in symbols:
                     scores_and_previous_symbols[k][symbol1][symbol2] = []
 
+        if len(sequence) == 1:
+            for symbol in symbols:
+                first_observation_transition_probability = symbol_symbol_counts['START'][symbol1]
+                scores_and_previous_symbols[1]['START'][symbol] = (log(first_observation_transition_probability) + log(emission_probability(symbol, sequence[0], emission_probabilities, symbol_counts)), 'START', 'NA')
+            predicted_symbols = [max([(scores_and_previous_symbols[1]['START'][symbol], symbol) for symbol in symbols], key=lambda score_and_previous_symbol : score_and_previous_symbol[0])[1]]
+            all_predicted_symbols.append(predicted_symbols)
+            continue
+
         # Set base case
         for symbol in symbols:
             first_observation_transition_probability = symbol_symbol_counts['START'][symbol1]
@@ -139,12 +146,6 @@ def second_order_viterbi(second_order_transition_probabilities, emission_probabi
 
         # Given the two subsequent symbols, we can get the current symbol from our matrix
         for k in range(n + 1, 1, -1):
-            print('')
-            print(scores_and_previous_symbols[k])
-            print('')
-            print(scores_and_previous_symbols[k][predicted_symbols[0]])
-            print('current',predicted_symbols[0])
-            print(predicted_symbols[1])
             predicted_symbols.insert(0, scores_and_previous_symbols[k][predicted_symbols[0]][predicted_symbols[1]][2])
 
         all_predicted_symbols.append(predicted_symbols)
@@ -163,4 +164,6 @@ def decode_file(training_data, dev_in):
 
     print(predicted_symbols)
 
-decode_file('data/test', 'data/test_dev')
+#  decode_file('data/test', 'data/test_dev')
+#  decode_file('data/EN/train', 'data/EN/dev.in')
+#  decode_file('data/ES/train', 'data/ES/dev.in')

@@ -104,15 +104,3 @@ def write_part_4_dev_out(predicted_symbols, dev_in, prediction_file):
         for i,line in enumerate(f):
             word_label = line.strip() + " " + symbols_list[i] + "\n"
             result_file.write(word_label)
-
-top_5 = top_m_decode_file(5, 'data/ES/train_processed', 'data/ES/dev.in_processed')
-write_part_4_dev_out(top_5, 'data/ES/dev.in', 'data/ES/dev.p4.out')
-
-top_5 = top_m_decode_file(5, 'data/EN/train_processed', 'data/EN/dev.in_processed')
-write_part_4_dev_out(top_5, 'data/EN/dev.in', 'data/EN/dev.p4.out')
-
-top_5 = top_m_decode_file(5, 'data/ES/train', 'data/ES/dev.in')
-write_part_4_dev_out(top_5, 'data/ES/dev.in', 'data/ES/dev.p4_notprocessed.out')
-
-top_5 = top_m_decode_file(5, 'data/EN/train', 'data/EN/dev.in')
-write_part_4_dev_out(top_5, 'data/EN/dev.in', 'data/EN/dev.p4_notprocessed.out')

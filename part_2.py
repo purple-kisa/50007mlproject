@@ -102,35 +102,3 @@ def write_part_2_dev_out(filename, predicted_word_symbol_sequence):
 
     for word_and_symbol in predicted_word_symbol_sequence:
         result_file.write(' '.join(word_and_symbol) + "\n")
-
-# Used to be for evaluation
-#  def get_symbol_sequence(dev_out_file):
-    #  with open(dev_out_file) as f:
-        #  return [line.split(' ')[-1].strip() for line in f if not line.isspace()]
-
-#  def get_entity_count(symbol_sequence):
-    #  entity_count = 0
-    #  inside_entity = False
-
-    #  for symbol in symbol_sequence:
-        #  if inside_entity:
-            #  if symbol[0] != 'I':
-                #  entity_count += 1
-                #  if symbol[0] == 'O':
-                    #  inside_entity = False
-        #  else:
-            #  if symbol[0] != 'O':
-                #  inside_entity = True
-
-    #  # In case our sequence ends with an entity
-    #  # we need to count this last entity
-    #  if symbol[0] != 'O':
-        #  entity_count += 1
-
-    #  return entity_count
-
-symbol_word_counts, symbol_counts = get_symbol_word_counts("data/CN/train")
-emission_probabilities = estimate_emission_params(symbol_word_counts, symbol_counts)
-#  print(find_symbol_estimate("data/CN/dev.in", "data/CN/dev.p2.out", emission_probabilities, symbol_counts))
-
-#  print(get_symbol_word_counts('data/test')[0])

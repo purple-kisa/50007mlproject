@@ -163,7 +163,7 @@ def decode_file(training_data, dev_in):
     observation_sequences = get_observation_sequences(dev_in)
     predicted_symbols = second_order_viterbi(second_order_transition_probabilities, emission_probabilities, symbol_symbol_counts, symbol_counts, observation_sequences)
 
-    print(predicted_symbols)
+    # print(predicted_symbols)
     return predicted_symbols
 
 
@@ -196,39 +196,9 @@ def add_predicted_symbols_to_file(predicted_symbols, dev_in, prediction_file):
                     symbols_list.append("")
                 else:
                     symbols_list.append(symbol)
-    print(symbols_list)
 
     with open(dev_in, encoding="utf8") as f:
         for i, line in enumerate(f):
             word_label = line.strip() + " " + symbols_list[i] + "\n"
             result_file.write(word_label)
 
-#  decode_file('data/test', 'data/test_dev')
-#  decode_file('data/EN/train', 'data/EN/dev.in')
-predicted_symbols = decode_file('data/EN/train_processed', 'data/EN/dev.in_processed')
-add_predicted_symbols_to_file(predicted_symbols, 'data/EN/dev.in', 'data/EN/dev.p5.out')
-
-predicted_symbols = decode_file('data/ES/train_processed', 'data/ES/dev.in_processed')
-add_predicted_symbols_to_file(predicted_symbols, 'data/ES/dev.in', 'data/ES/dev.p5.out')
-
-predicted_symbols = decode_file('data/EN/train_processed', 'data/p5_test/EN/test.in_processed')
-add_predicted_symbols_to_file(predicted_symbols, 'data/p5_test/EN/test.in_processed', 'data/EN/test.p5.out')
-
-predicted_symbols = decode_file('data/ES/train_processed', 'data/p5_test/ES/test.in_processed')
-add_predicted_symbols_to_file(predicted_symbols, 'data/p5_test/ES/test.in_processed', 'data/ES/test.p5.out')
-
-# pre_process('data/EN/train')
-# pre_process('data/EN/dev.in')
-#
-# pre_process('data/ES/train')
-# pre_process('data/ES/dev.in')
-#
-# pre_process('data/CN/train')
-# pre_process('data/CN/dev.in')
-#
-# pre_process('data/SG/train')
-# pre_process('data/SG/dev.in')
-#
-# pre_process('data/p5_test/EN/test.in')
-#
-# pre_process('data/p5_test/ES/test.in')

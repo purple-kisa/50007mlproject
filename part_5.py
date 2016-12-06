@@ -178,13 +178,14 @@ def pre_process(data_file):
                     new = line.replace(word, word.lower())
                     file_text += new
 
-        processed_text = re.sub('@\w+', '', file_text)
-        processed_text = re.sub('#\w+', '', processed_text)
+        processed_text = re.sub('@(\w+)', r'\1', file_text)
+        processed_text = re.sub('#(\w+)', r'\1', processed_text)
         output_f.write(processed_text)
 
 #  decode_file('data/test', 'data/test_dev')
 #  decode_file('data/EN/train', 'data/EN/dev.in')
 #  decode_file('data/ES/train', 'data/ES/dev.in')
+pre_process('data/EN/train')
 pre_process('data/EN/dev.in')
 
 pre_process('data/ES/train')
